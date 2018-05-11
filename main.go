@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"fmt"
 	"os"
+	comp "github.com/taxio/file-compresser/mycompress"
 )
 
 func read_file(filename string) []uint8 {
@@ -27,45 +28,6 @@ func output_file(filename string, data []uint8) {
 	}
 }
 
-func encode_runlength(data []uint8) []uint8 {
-	var compressed []uint8
-	var p, cnt uint8 = data[0], 0
-	for i, d := range data {
-		cnt++
-		if i == 0{
-			p = d
-			cnt = 0
-			continue
-		}
-
-		if p != d {
-			compressed = append(compressed, p)
-			compressed = append(compressed, cnt)
-			cnt = 0
-		}
-		p = d
-	}
-	if cnt == 0{
-		compressed = append(compressed, p)
-		compressed = append(compressed, 1)
-	}
-	return compressed
-}
-
-func decode_runlength(data []uint8) []uint8{
-	var decoded []uint8
-	if len(data) % 2 == 1{
-		fmt.Errorf("this lngrs file is incorrect\n")
-		os.Exit(-1)
-	}
-
-	for i:=0; i<len(data); i+=2{
-		for j:=0; j<int(data[i+1]); j++{
-			decoded = append(decoded, data[i])
-		}
-	}
-	return decoded
-}
 
 func main(){
 
@@ -80,7 +42,7 @@ func main(){
 	fmt.Print(data[len(data)-10:])
 	fmt.Printf("\n%d bytes\n", len(data))
 
-	compressed := encode_runlength(data)
+	compressed := comp.Encode(data)
 	fmt.Println("after")
 	fmt.Print(compressed[0:10])
 	fmt.Print("...")
@@ -88,7 +50,7 @@ func main(){
 	fmt.Printf("\n%d bytes\n", len(compressed))
 	//output_file("./img/taxio.lngrs", compressed)
 
-	decoded := decode_runlength(compressed)
+	decoded := comp.Decode(compressed)
 	fmt.Println("decode")
 	fmt.Print(decoded[0:10])
 	fmt.Print("...")

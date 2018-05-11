@@ -32,8 +32,8 @@ func main(){
 	filename := "./img/taxio.png"
 	data := read_file(filename)
 
-	runLength := &Runlength{}
-	var comp Base = runLength
+	compAlg := &Runlength{}
+	var comp Base = compAlg
 	fmt.Println("encode_runlength compress")
 
 	fmt.Println("before")
@@ -48,7 +48,7 @@ func main(){
 	fmt.Print("...")
 	fmt.Print(compressed[len(compressed)-10:])
 	fmt.Printf("\n%d bytes\n", len(compressed))
-	//output_file("./img/taxio.lngrs", compressed)
+	output_file("./img/encode.lngrs", compressed)
 
 	decoded := comp.Decode(compressed)
 	fmt.Println("decode")
@@ -56,5 +56,6 @@ func main(){
 	fmt.Print("...")
 	fmt.Print(decoded[len(decoded)-10:])
 	fmt.Printf("\n%d bytes\n", len(decoded))
+	output_file("./img/decoded.png", decoded)
 
 }

@@ -1,11 +1,9 @@
-//package file_compresser
 package main
 
 import (
 	"io/ioutil"
 	"fmt"
 	"os"
-	comp "github.com/taxio/file-compresser/mycompress"
 )
 
 func read_file(filename string) []uint8 {
@@ -34,6 +32,8 @@ func main(){
 	filename := "./img/taxio.png"
 	data := read_file(filename)
 
+	runLength := &Runlength{}
+	var comp Base = runLength
 	fmt.Println("encode_runlength compress")
 
 	fmt.Println("before")

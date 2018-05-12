@@ -32,30 +32,24 @@ func main(){
 	filename := "./img/taxio.png"
 	data := read_file(filename)
 
-	compAlg := &Runlength{}
+	compAlg := &Huffman{}
 	var comp Base = compAlg
 	fmt.Println("encode_runlength compress")
 
 	fmt.Println("before")
-	fmt.Print(data[0:10])
-	fmt.Print("...")
-	fmt.Print(data[len(data)-10:])
-	fmt.Printf("\n%d bytes\n", len(data))
+	fmt.Printf("%v...%v\n", data[:10], data[len(data)-10:])
+	fmt.Printf("%d bytes\n", len(data))
 
 	compressed := comp.Encode(data)
 	fmt.Println("after")
-	fmt.Print(compressed[0:10])
-	fmt.Print("...")
-	fmt.Print(compressed[len(compressed)-10:])
-	fmt.Printf("\n%d bytes\n", len(compressed))
+	fmt.Printf("%v...%v\n", compressed[:10], compressed[len(compressed)-10:])
+	fmt.Printf("%d bytes\n", len(compressed))
 	output_file("./img/encode.lngrs", compressed)
 
 	decoded := comp.Decode(compressed)
 	fmt.Println("decode")
-	fmt.Print(decoded[0:10])
-	fmt.Print("...")
-	fmt.Print(decoded[len(decoded)-10:])
-	fmt.Printf("\n%d bytes\n", len(decoded))
+	fmt.Printf("%v...%v\n", decoded[:10], decoded[len(decoded)-10:])
+	fmt.Printf("%d bytes\n", len(decoded))
 	output_file("./img/decoded.png", decoded)
 
 }

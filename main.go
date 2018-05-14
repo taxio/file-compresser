@@ -16,35 +16,46 @@ func read_file(filename string) []uint8 {
 	return data
 }
 
-func output_file(filename string, data []uint8) {
+func output_file(filename string, data []uint8) error {
+
+	// create output file
 	file, err := os.Create(filename)
 	defer file.Close()
 	if err != nil{
-		fmt.Errorf("cannot create output file")
-	}else{
-		file.Write(data)
+		return err
 	}
+	file.Write(data)
+
+	return nil
 }
 
 
 func main(){
 
 	inputName := "./text/bin.txt"
-	outputName := "./text/bin_decoded.txt"
+	compressedName := "./output/compressed.txt"
+	decodedName := "./output/decoded.txt"
 	data := read_file(inputName)
 
-	comp := &RunlengthWyle{}
+	comp := &RunlengthFixed{}
 	fmt.Printf("before : %d bytes\n", len(data))
 	//fmt.Println(data)
 
 	compressed := comp.Encode(data)
 	fmt.Printf("after : %d bytes\n", len(compressed))
 	//fmt.Println(compressed)
-	output_file(outputName, compressed)
+	err := output_file(compressedName, compressed)
+	if err != nil{
+		fmt.Errorf("%v\n", err)
+	}
 	fmt.Printf("Raito : %f%%\n", float32(len(compressed))/float32(len(data)))
 
-	//decoded := comp.Decode(compressed)
-	//fmt.Printf("decode : %d bytes\n", len(decoded))
+	decoded := comp.Decode(compressed)
 	//fmt.Println(decoded)
+	fmt.Printf("decode : %d bytes\n", len(decoded))
+	err = output_file(decodedName, decoded)
+	if err != nil{
+		fmt.Errorf("%v\n", err)
+	}
 
 }

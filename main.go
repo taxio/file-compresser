@@ -33,7 +33,7 @@ func main(){
 	outputName := "./text/bin_decoded.txt"
 	data := read_file(inputName)
 
-	comp := &RunlengthFixed{}
+	comp := &RunlengthWyle{}
 	fmt.Printf("before : %d bytes\n", len(data))
 	//fmt.Println(data)
 
@@ -43,8 +43,8 @@ func main(){
 	output_file(outputName, compressed)
 	fmt.Printf("Raito : %f%%\n", float32(len(compressed))/float32(len(data)))
 
-	decoded := comp.Decode(compressed)
-	fmt.Printf("decode : %d bytes\n", len(decoded))
+	//decoded := comp.Decode(compressed)
+	//fmt.Printf("decode : %d bytes\n", len(decoded))
 	//fmt.Println(decoded)
 
 }

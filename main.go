@@ -29,32 +29,24 @@ func output_file(filename string, data []uint8) {
 
 func main(){
 
-	filename := "./img/taxio.png"
-	data := read_file(filename)
+	inputName := "./text/bin.txt"
+	outputName := "./text/bin_decoded.txt"
+	data := read_file(inputName)
 
-	runLength := &Runlength{}
-	var comp Base = runLength
-	fmt.Println("encode_runlength compress")
+	comp := &RunlengthFixed{}
 
-	fmt.Println("before")
-	fmt.Print(data[0:10])
-	fmt.Print("...")
-	fmt.Print(data[len(data)-10:])
-	fmt.Printf("\n%d bytes\n", len(data))
+	fmt.Println("before : ")
+	fmt.Printf("before : %d bytes\n", len(data))
+	fmt.Println(data)
 
 	compressed := comp.Encode(data)
 	fmt.Println("after")
-	fmt.Print(compressed[0:10])
-	fmt.Print("...")
-	fmt.Print(compressed[len(compressed)-10:])
-	fmt.Printf("\n%d bytes\n", len(compressed))
-	//output_file("./img/taxio.lngrs", compressed)
+	fmt.Printf("after : %d bytes\n", len(compressed))
+	fmt.Println(compressed)
+	output_file(outputName, compressed)
 
 	decoded := comp.Decode(compressed)
-	fmt.Println("decode")
-	fmt.Print(decoded[0:10])
-	fmt.Print("...")
-	fmt.Print(decoded[len(decoded)-10:])
-	fmt.Printf("\n%d bytes\n", len(decoded))
+	fmt.Printf("decode : %d bytes\n", len(decoded))
+	fmt.Println(decoded)
 
 }

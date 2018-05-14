@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-type Runlength struct {}
-func (r *Runlength)Encode(data []uint8) []uint8 {
+type RunlengthFixed struct {}
+func (r *RunlengthFixed)Encode(data []uint8) []uint8 {
 	var compressed []uint8
 	var p, cnt uint8 = data[0], 0
 	for i, d := range data {
@@ -31,7 +31,7 @@ func (r *Runlength)Encode(data []uint8) []uint8 {
 	return compressed
 }
 
-func (r *Runlength)Decode(data []uint8) []uint8{
+func (r *RunlengthFixed)Decode(data []uint8) []uint8{
 	var decoded []uint8
 	if len(data) % 2 == 1{
 		fmt.Errorf("this lngrs file is incorrect\n")
@@ -45,3 +45,4 @@ func (r *Runlength)Decode(data []uint8) []uint8{
 	}
 	return decoded
 }
+

@@ -5,29 +5,22 @@ import (
 	"os"
 )
 
+// 通常のRun Length法
 type RunlengthFixed struct {}
 func (r *RunlengthFixed)Encode(data []uint8) []uint8 {
 	var compressed []uint8
-	var p, cnt uint8 = data[0], 0
-	for i, d := range data {
-		cnt++
-		if i == 0{
-			p = d
-			cnt = 0
-			continue
-		}
-
-		if p != d {
+	var p, cnt uint8 = data[0], 1
+	for _, d := range data[1:] {
+		if p != d || cnt == 255{
 			compressed = append(compressed, p)
 			compressed = append(compressed, cnt)
 			cnt = 0
 		}
 		p = d
+		cnt++
 	}
-	if cnt == 0{
-		compressed = append(compressed, p)
-		compressed = append(compressed, 1)
-	}
+	compressed = append(compressed, p)
+	compressed = append(compressed, cnt)
 	return compressed
 }
 

@@ -7,7 +7,7 @@ import (
 
 type HuffmanNode struct {
 	data uint8
-	cnt uint8
+	cnt uint32
 
 	parent *HuffmanNode
 	left *HuffmanNode
@@ -23,8 +23,8 @@ func NewHuffmanNode(data uint8) HuffmanNode{
 	return node
 }
 
-func countContains(data []uint8, target uint8) uint8{
-	var cnt uint8 = 0
+func countContains(data []uint8, target uint8) uint32{
+	var cnt uint32 = 0
 	for _, d := range data {
 		if d == target{
 			cnt++
@@ -33,8 +33,38 @@ func countContains(data []uint8, target uint8) uint8{
 	return cnt
 }
 
+func addNode(head HuffmanNode, left HuffmanNode, right HuffmanNode) HuffmanNode{
+	head.left = &left
+	left.parent = &head
+	head.right = &right
+	right.parent = &head
+	head.cnt = head.left.cnt + head.right.cnt
+	return head
+}
+
+func create_tree(nodes []HuffmanNode) HuffmanNode{
+	head := NewHuffmanNode(0)
+	if len(nodes) == 1 {
+		head.left = &nodes[0]
+		head.cnt = head.left.cnt
+		return head
+	}
+	head = addNode(head, nodes[0], nodes[1])
+	for _, node := range nodes[2:] {
+		tmp := NewHuffmanNode(0)
+		if node.cnt < head.cnt {
+			tmp = addNode(tmp, node, head)
+		}else{
+			tmp = addNode(tmp, head, node)
+		}
+		head = tmp
+	}
+	return head
+}
+
 type Huffman struct {}
 func (h *Huffman)Encode(data []uint8) []uint8 {
+	// calc freq
 	nodes := make([]HuffmanNode, 0, 256)
 	for i:=0; i<256; i++{
 		cnt := countContains(data, uint8(i))
@@ -50,8 +80,11 @@ func (h *Huffman)Encode(data []uint8) []uint8 {
 	})
 	fmt.Println(nodes)
 
-	// create bit data
+	// create tree
+	tree_head := create_tree(nodes)
+	fmt.Println(tree_head)
 
+	// create bit data
 
 	// create encoded data
 

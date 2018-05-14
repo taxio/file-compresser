@@ -34,19 +34,17 @@ func main(){
 	data := read_file(inputName)
 
 	comp := &RunlengthFixed{}
-
-	fmt.Println("before : ")
 	fmt.Printf("before : %d bytes\n", len(data))
-	fmt.Println(data)
+	//fmt.Println(data)
 
 	compressed := comp.Encode(data)
-	fmt.Println("after")
 	fmt.Printf("after : %d bytes\n", len(compressed))
-	fmt.Println(compressed)
+	//fmt.Println(compressed)
 	output_file(outputName, compressed)
+	fmt.Printf("Raito : %f%%\n", float32(len(compressed))/float32(len(data)))
 
 	decoded := comp.Decode(compressed)
 	fmt.Printf("decode : %d bytes\n", len(decoded))
-	fmt.Println(decoded)
+	//fmt.Println(decoded)
 
 }

@@ -8,6 +8,7 @@ import (
 type HuffmanNode struct {
 	data uint8
 	cnt uint32
+	code *[]bool
 
 	parent *HuffmanNode
 	left *HuffmanNode
@@ -17,6 +18,8 @@ func NewHuffmanNode(data uint8) HuffmanNode{
 	node := HuffmanNode{}
 	node.data = data
 	node.cnt = 0
+	code := make([]bool, 0, 256)
+	node.code = &code
 	node.parent = nil
 	node.left = nil
 	node.right = nil
@@ -62,6 +65,21 @@ func create_tree(nodes []HuffmanNode) HuffmanNode{
 	return head
 }
 
+func attachCode(node HuffmanNode, nextBit bool){
+	parentCode := *node.parent.code
+	*node.code = append(*node.code, parentCode...)
+	*node.code = append(*node.code, nextBit)
+	if node.right == nil && node.left == nil{
+		return
+	}
+	if node.right != nil{
+		attachCode(*node.right, false)
+	}
+	if node.left != nil{
+		attachCode(*node.left, true)
+	}
+}
+
 type Huffman struct {}
 func (h *Huffman)Encode(data []uint8) []uint8 {
 	// calc freq
@@ -85,6 +103,8 @@ func (h *Huffman)Encode(data []uint8) []uint8 {
 	fmt.Println(tree_head)
 
 	// create bit data
+	attachCode(*tree_head.right, false)
+	attachCode(*tree_head.left, true)
 
 	// create encoded data
 

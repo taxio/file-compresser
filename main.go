@@ -37,21 +37,18 @@ func main(){
 	decodedName := "./output/decoded.txt"
 	data := read_file(inputName)
 
-	comp := &RunlengthFixed{}
+	comp := &RunlengthWyle{}
 	fmt.Printf("before : %d bytes\n", len(data))
-	//fmt.Println(data)
 
 	compressed := comp.Encode(data)
 	fmt.Printf("after : %d bytes\n", len(compressed))
-	//fmt.Println(compressed)
 	err := output_file(compressedName, compressed)
 	if err != nil{
 		fmt.Errorf("%v\n", err)
 	}
-	fmt.Printf("Raito : %f%%\n", float32(len(compressed))/float32(len(data)))
+	fmt.Printf("Raito : %f%%\n", float32(len(compressed))/float32(len(data))*100)
 
 	decoded := comp.Decode(compressed)
-	//fmt.Println(decoded)
 	fmt.Printf("decode : %d bytes\n", len(decoded))
 	err = output_file(decodedName, decoded)
 	if err != nil{

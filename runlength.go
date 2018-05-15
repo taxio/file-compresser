@@ -194,7 +194,7 @@ func (r *RunlengthWyle)Decode(data []uint8) []uint8{
 			wyleBuff = append(wyleBuff, bits[idx])
 			idx++
 		}
-		runLen := convertBoolsToData(wyleBuff)
+		runLen := convertBoolsToData(wyleBuff) + 1
 
 		// データ部分を取り出す
 		dataBuff := make([]bool, 0, 8)
@@ -204,15 +204,12 @@ func (r *RunlengthWyle)Decode(data []uint8) []uint8{
 		}
 		outData := convertBoolsToData(dataBuff)
 
-		fmt.Printf("len: %d, data: %d | ", runLen, outData)
-
 		//出力データに入れる
 		for i:=0; i<int(runLen); i++{
 			decoded = append(decoded, uint8(outData))
 		}
 	}
-	fmt.Println("")
 
-	return data
+	return decoded
 }
 

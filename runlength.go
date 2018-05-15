@@ -76,14 +76,31 @@ func initBitBuff(){
 	outputData = make([]uint8, 0)
 }
 
-func addOutputBuff(data uint32, lenData uint8) (error){
+// 入力されたデータのビットを逆順にして返す
+func reverseBits(data uint32, lenData uint8) uint32 {
+	var r uint32 = 0
+	for i:=int(lenData-1); i>=0; i--{
+		r |= (data>>uint8(i) & 1) << (lenData-uint8(i)-1)
+	}
+	return r
+}
+
+// TODO: 多分bitが逆になってる
+func addOutputBuff(data uint32, lenData uint8) error{
 	if lenBitBuff+lenData > 32{
 		return errors.New("over output buffer")
 	}
+	// dataの並びを反転
+	data = reverseBits(data, lenData)
+
+	// バッファに追加
 	bitBuff |= data << lenBitBuff
 	lenBitBuff += lenData
+
+	// バッファに8bit以上溜まったら出力
 	for lenBitBuff/8 > 0{
 		o := bitBuff & 0xff
+		o = reverseBits(o, 8)
 		outputData = append(outputData, uint8(o))
 		bitBuff >>= 8
 		lenBitBuff -= 8
@@ -95,7 +112,6 @@ func displayBits(bits uint32, lenBits uint8){
 	for i:=int(lenBits)-1; i>=0; i--{
 		fmt.Printf("%d", 1 & (bits >> uint8(i)))
 	}
-	fmt.Println("")
 }
 
 // Wyle符号でのRun Length法
@@ -108,7 +124,9 @@ func (r *RunlengthWyle)Encode(data []uint8) []uint8 {
 		if p != d {
 			wyle, lenWyle := convertWyle(cnt)
 			addOutputBuff(wyle, lenWyle)
+			displayBits(wyle, lenWyle)
 			addOutputBuff(uint32(p), 8)
+			displayBits(uint32(p), 8)
 			cnt = 0
 		}
 		p = d
@@ -116,7 +134,19 @@ func (r *RunlengthWyle)Encode(data []uint8) []uint8 {
 	}
 	wyle, lenWyle := convertWyle(cnt)
 	addOutputBuff(wyle, lenWyle)
+	displayBits(wyle, lenWyle)
 	addOutputBuff(uint32(p), 8)
+	addOutputBuff(0, 8-lenBitBuff)
+	displayBits(uint32(p), 8)
+	fmt.Println("")
 	return outputData
 }
+
+//func (r *RunlengthWyle)Decode(data []uint8) []uint8{
+//	for _, d := range data {
+//		fmt.Printf("%b", d)
+//	}
+//	fmt.Println("")
+//	return data
+//}
 

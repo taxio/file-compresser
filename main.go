@@ -16,45 +16,43 @@ func read_file(filename string) []uint8 {
 	return data
 }
 
-func output_file(filename string, data []uint8) {
+func output_file(filename string, data []uint8) error {
+
+	// create output file
 	file, err := os.Create(filename)
 	defer file.Close()
 	if err != nil{
-		fmt.Errorf("cannot create output file")
-	}else{
-		file.Write(data)
+		return err
 	}
+	file.Write(data)
+
+	return nil
 }
 
 
 func main(){
 
-	filename := "./img/taxio.png"
-	data := read_file(filename)
+	inputName := "./text/bin.txt"
+	compressedName := "./output/compressed.txt"
+	decodedName := "./output/decoded.txt"
+	data := read_file(inputName)
 
-	runLength := &Runlength{}
-	var comp Base = runLength
-	fmt.Println("encode_runlength compress")
-
-	fmt.Println("before")
-	fmt.Print(data[0:10])
-	fmt.Print("...")
-	fmt.Print(data[len(data)-10:])
-	fmt.Printf("\n%d bytes\n", len(data))
+	comp := &RunlengthWyle{}
+	fmt.Printf("before : %d bytes\n", len(data))
 
 	compressed := comp.Encode(data)
-	fmt.Println("after")
-	fmt.Print(compressed[0:10])
-	fmt.Print("...")
-	fmt.Print(compressed[len(compressed)-10:])
-	fmt.Printf("\n%d bytes\n", len(compressed))
-	//output_file("./img/taxio.lngrs", compressed)
+	fmt.Printf("after : %d bytes\n", len(compressed))
+	err := output_file(compressedName, compressed)
+	if err != nil{
+		fmt.Errorf("%v\n", err)
+	}
+	fmt.Printf("Raito : %f%%\n", float32(len(compressed))/float32(len(data))*100)
 
 	decoded := comp.Decode(compressed)
-	fmt.Println("decode")
-	fmt.Print(decoded[0:10])
-	fmt.Print("...")
-	fmt.Print(decoded[len(decoded)-10:])
-	fmt.Printf("\n%d bytes\n", len(decoded))
+	fmt.Printf("decode : %d bytes\n", len(decoded))
+	err = output_file(decodedName, decoded)
+	if err != nil{
+		fmt.Errorf("%v\n", err)
+	}
 
 }

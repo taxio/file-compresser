@@ -59,7 +59,7 @@ func convertWyle(data uint32) (uint32, uint8){
 	}
 
 	// dataを追加
-	ret |= data
+	ret |= data-1
 
 	// 区切り文字の0とdataの長さを加算
 	lenData += 1+ lenData +2
@@ -85,7 +85,6 @@ func reverseBits(data uint32, lenData uint8) uint32 {
 	return r
 }
 
-// TODO: 多分bitが逆になってる
 func addOutputBuff(data uint32, lenData uint8) error{
 	if lenBitBuff+lenData > 32{
 		return errors.New("over output buffer")
@@ -124,9 +123,7 @@ func (r *RunlengthWyle)Encode(data []uint8) []uint8 {
 		if p != d {
 			wyle, lenWyle := convertWyle(cnt)
 			addOutputBuff(wyle, lenWyle)
-			displayBits(wyle, lenWyle)
 			addOutputBuff(uint32(p), 8)
-			displayBits(uint32(p), 8)
 			cnt = 0
 		}
 		p = d
@@ -134,19 +131,88 @@ func (r *RunlengthWyle)Encode(data []uint8) []uint8 {
 	}
 	wyle, lenWyle := convertWyle(cnt)
 	addOutputBuff(wyle, lenWyle)
-	displayBits(wyle, lenWyle)
 	addOutputBuff(uint32(p), 8)
+
+	// バッファに残っているデータを出力しきるために0を詰める
 	addOutputBuff(0, 8-lenBitBuff)
-	displayBits(uint32(p), 8)
-	fmt.Println("")
+
 	return outputData
 }
 
-//func (r *RunlengthWyle)Decode(data []uint8) []uint8{
-//	for _, d := range data {
-//		fmt.Printf("%b", d)
-//	}
-//	fmt.Println("")
-//	return data
-//}
+func convertDataToBools(data []uint8) []bool{
+	var bools []bool = make([]bool, 0, len(data)*8)
+	for _, d := range data{
+		for i:=7; i>=0; i--{
+			bit := false
+			if (d>>uint8(i) & 1) == 1{
+				bit = true
+			}
+			bools = append(bools, bit)
+		}
+	}
+	return bools
+}
+
+func convertBoolsToData(bits []bool) uint32 {
+	var n uint32 = 0
+	for i, b := range bits {
+		if b {
+			n |= 1<<uint8(len(bits)-i-1)
+		}
+	}
+	return n
+}
+
+func (r *RunlengthWyle)Decode(data []uint8) []uint8{
+	var decoded []uint8
+	bits := convertDataToBools(data)
+
+	idx := 0
+	for idx<len(bits){
+		// 最後の0詰めの場合は終了
+		if len(bits)-idx < 8{
+			break
+		}
+
+		// 0が来るまでカウント
+		lenPrefix := 0
+		for {
+			if bits[idx] == false{
+				idx++
+				break
+			}
+			lenPrefix++
+			idx++
+		}
+
+		// Runのビット長を算出
+		lenWyle := lenPrefix + 2
+
+		// Wyle部分を取り出して復号
+		wyleBuff := make([]bool, 0, lenWyle)
+		for i:=0; i<lenWyle; i++{
+			wyleBuff = append(wyleBuff, bits[idx])
+			idx++
+		}
+		runLen := convertBoolsToData(wyleBuff)
+
+		// データ部分を取り出す
+		dataBuff := make([]bool, 0, 8)
+		for i:=0; i<8; i++{
+			dataBuff = append(dataBuff, bits[idx])
+			idx++
+		}
+		outData := convertBoolsToData(dataBuff)
+
+		fmt.Printf("len: %d, data: %d | ", runLen, outData)
+
+		//出力データに入れる
+		for i:=0; i<int(runLen); i++{
+			decoded = append(decoded, uint8(outData))
+		}
+	}
+	fmt.Println("")
+
+	return data
+}
 
